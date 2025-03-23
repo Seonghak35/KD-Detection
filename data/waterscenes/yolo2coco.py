@@ -22,12 +22,12 @@ import pdb
 from tqdm import tqdm
 
 # Set the paths for the input and output directories
-image_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/image/' ## image foldar
-input_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/detection/yolo/' ## yolo annotations
-output_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/detection/coco/' ## coco annotations
+image_dir = '/HDD/guest/ssg/KD-Detection/data/waterscenes/train/' ## image foldar
+input_dir = '/HDD/guest/ssg/KD-Detection/data/waterscenes/detection/yolo/' ## yolo annotations
+output_dir = '/HDD/guest/ssg/KD-Detection/data/waterscenes/annotations/' ## coco annotations
 
 # Define the categories for the COCO dataset
-categories = [{"id": 0, "name": "pier"}, {"id": 1, "name": "buoy"}, {"id": 2, "name": "sailor"}, {"id": 3, "name": "ship"}, {"id": 4, "name": "boat"}, {"id": 5, "name": "vessel"}, {"id": 6, "name": "kayak"}]
+categories = [{"id": 1, "name": "pier"}, {"id": 2, "name": "buoy"}, {"id": 3, "name": "sailor"}, {"id": 4, "name": "ship"}, {"id": 5, "name": "boat"}, {"id": 6, "name": "vessel"}, {"id": 7, "name": "kayak"}]
 
 # Define the COCO dataset dictionary
 coco_dataset = {
@@ -61,13 +61,15 @@ for image_file in tqdm(os.listdir(image_dir)):
     
     # Loop through the annotations and add them to the COCO dataset
     for ann in annotations:
+        category_id = int(ann.strip().split()[0]) + 1
+        
         x, y, w, h = map(float, ann.strip().split()[1:])
         x_min, y_min = int((x - w / 2) * width), int((y - h / 2) * height)
         x_max, y_max = int((x + w / 2) * width), int((y + h / 2) * height)
         ann_dict = {
             "id": len(coco_dataset["annotations"]),
             "image_id": int(image_file.split('.')[0]),
-            "category_id": 0,
+            "category_id": category_id,
             "bbox": [x_min, y_min, x_max - x_min, y_max - y_min],
             "area": (x_max - x_min) * (y_max - y_min),
             "iscrowd": 0
@@ -75,5 +77,5 @@ for image_file in tqdm(os.listdir(image_dir)):
         coco_dataset["annotations"].append(ann_dict)
 
 # Save the COCO dataset to a JSON file
-with open(os.path.join(output_dir, 'annotations.json'), 'w') as f:
+with open(os.path.join(output_dir, 'instances_train.json'), 'w') as f:
     json.dump(coco_dataset, f)
