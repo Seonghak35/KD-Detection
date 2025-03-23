@@ -22,9 +22,9 @@ import pdb
 from tqdm import tqdm
 
 # Set the paths for the input and output directories
-image_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/image/'
-input_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/detection/yolo/'
-output_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/detection/coco/'
+image_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/image/' ## image foldar
+input_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/detection/yolo/' ## yolo annotations
+output_dir = '/SSD/guest/slava/KD-Detection/data/waterscenes/detection/coco/' ## coco annotations
 
 # Define the categories for the COCO dataset
 categories = [{"id": 0, "name": "pier"}, {"id": 1, "name": "buoy"}, {"id": 2, "name": "sailor"}, {"id": 3, "name": "ship"}, {"id": 4, "name": "boat"}, {"id": 5, "name": "vessel"}, {"id": 6, "name": "kayak"}]
