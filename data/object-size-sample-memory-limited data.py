@@ -13,70 +13,58 @@ categories = data['categories']
 # Define area thresholds
 LARGE_THRESHOLD = 96 * 96
 SMALL_THRESHOLD = 32 * 32
-
-# Split annotations by object size
-large_annotations = []
-medium_annotations = []
-small_annotations = []
-
-for ann in annotations:
-    area = ann['area']
-    if area > LARGE_THRESHOLD:
-        large_annotations.append(ann)
-    elif area < SMALL_THRESHOLD:
-        small_annotations.append(ann)
-    else:
-        medium_annotations.append(ann)
-
-# 메모리 해제
-del annotations
-gc.collect()
 MAX_IMAGES = 10000
 
-def create_coco_subset(annotations_subset):
-    all_image_ids = set(ann['image_id'] for ann in annotations_subset)
-    
-    seen = set()
-    ordered_unique_ids = []
-    for img_id in all_image_ids:
-        if img_id not in seen:
-            seen.add(img_id)
-            ordered_unique_ids.append(img_id)
-        if len(ordered_unique_ids) >= MAX_IMAGES:
-            break
-    
-    
-    image_ids = set(ordered_unique_ids)
-    images_subset = [img for img in images if img['id'] in image_ids]
-    annotations_filtered = [ann for ann in annotations_subset if ann['image_id'] in image_ids]
+# 객체 크기에 따른 image_id 수집 (annotation 기준)
+image_to_area = {}  # image_id: [annotation areas]
 
-    return {
-        "images": images_subset,
-        "annotations": annotations_subset,
+for ann in annotations:
+    img_id = ann['image_id']
+    area = ann['area']
+    if img_id not in image_to_area:
+        image_to_area[img_id] = []
+    image_to_area[img_id].append(area)
+
+# 이미지 분류
+large_img_ids = []
+medium_img_ids = []
+small_img_ids = []
+
+for img_id, areas in image_to_area.items():
+    for area in areas:
+        if area > LARGE_THRESHOLD:
+            large_img_ids.append(img_id)
+            break
+        elif area < SMALL_THRESHOLD:
+            small_img_ids.append(img_id)
+            break
+        else:
+            medium_img_ids.append(img_id)
+            break
+        
+def limit_ids(id_list):
+    return set(id_list[:MAX_IMAGES])
+
+large_img_ids = limit_ids(list(dict.fromkeys(large_img_ids)))
+medium_img_ids = limit_ids(list(dict.fromkeys(medium_img_ids)))
+small_img_ids = limit_ids(list(dict.fromkeys(small_img_ids)))
+
+
+# subset 생성 함수
+def create_subset(image_ids, name):
+    subset_images = [img for img in images if img['id'] in image_ids]
+    subset_annotations = [ann for ann in annotations if ann['image_id'] in image_ids]
+    subset = {
+        "images": subset_images,
+        "annotations": subset_annotations,
         "categories": categories
     }
-
-# Create and save datasets one by one to 절약 메모리
-def save_subset(filename, annotations_subset):
-    dataset = create_coco_subset(annotations_subset)
-    with open(filename, 'w') as f:
-        json.dump(dataset, f)
-    print(f"{filename} saved: {len(dataset['images'])} images, {len(dataset['annotations'])} annotations")
-    del dataset
+    with open(f"coco_{name}.json", 'w') as f:
+        json.dump(subset, f)
+    print(f"coco_{name}.json saved: {len(subset_images)} images, {len(subset_annotations)} annotations")
     gc.collect()
 
-save_subset('coco_large.json', large_annotations)
-del large_annotations
-gc.collect()
-
-save_subset('coco_medium.json', medium_annotations)
-del medium_annotations
-gc.collect()
-
-save_subset('coco_small.json', small_annotations)
-del small_annotations
-gc.collect()
-
-# 마무리 정리
-del images, categories, data
-gc.collect()
+# 저장
+create_subset(large_img_ids, "large")
+create_subset(medium_img_ids, "medium")
+create_subset(small_img_ids, "small")
