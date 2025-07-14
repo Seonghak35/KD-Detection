@@ -66,6 +66,7 @@ from .crosskd_fcos import CrossKDFCOS
 ### Revised by hakk ###
 from .kd_single_stage import KDSingleStageDetector
 from .kd_gfl import KDGFL
+from .kd_yolox import KDYOLOX
 
 __all__ = [
     'ATSS', 'BaseDetector', 'SingleStageDetector', 'TwoStageDetector', 'RPN',
@@ -82,5 +83,5 @@ __all__ = [
     'CrossKDSingleStageDetector', 'CrossKDRetinaNet', 'CrossKDATSS', 'CrossKDFCOS',
 
     ### Revised by hakk ###
-    'KDSingleStageDetector', 'KDGFL'
+    'KDSingleStageDetector', 'KDGFL', 'KDYOLOX'
 ]
