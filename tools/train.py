@@ -9,6 +9,18 @@ from mmengine.logging import print_log
 from mmengine.registry import RUNNERS
 from mmengine.runner import Runner
 
+### Revised by hakk ###
+import random
+import numpy as np
+import torch
+
+def set_random_seed(seed: int = 42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
@@ -47,6 +59,10 @@ def parse_args():
         default='none',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+
+    ### Revised by hakk ###
+    parser.add_argument('--seed', type=int, default=42, help='Random seed')
+
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -56,6 +72,9 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    ### Revised by hakk ###
+    set_random_seed(args.seed)
 
     # load config
     cfg = Config.fromfile(args.config)
