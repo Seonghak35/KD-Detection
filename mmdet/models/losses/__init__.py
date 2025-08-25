@@ -20,6 +20,13 @@ from .utils import reduce_loss, weight_reduce_loss, weighted_loss
 from .varifocal_loss import VarifocalLoss
 from .pkd_loss import PKDLoss
 
+#######################
+### Revised by hakk ###
+#######################
+from .mse_loss import MSELoss
+from .cwd_loss import CWDLoss
+
+
 __all__ = [
     'accuracy', 'Accuracy', 'cross_entropy', 'binary_cross_entropy',
     'mask_cross_entropy', 'CrossEntropyLoss', 'sigmoid_focal_loss',
@@ -30,5 +37,10 @@ __all__ = [
     'weighted_loss', 'L1Loss', 'l1_loss', 'isr_p', 'carl_loss',
     'AssociativeEmbeddingLoss', 'GaussianFocalLoss', 'QualityFocalLoss',
     'DistributionFocalLoss', 'VarifocalLoss', 'KnowledgeDistillationKLDivLoss',
-    'SeesawLoss', 'DiceLoss', 'KDQualityFocalLoss', 'PKDLoss'
+    'SeesawLoss', 'DiceLoss', 'KDQualityFocalLoss', 'PKDLoss',
+
+    #######################
+    ### Revised by hakk ###
+    #######################
+    'MSELoss', 'CWDLoss'
 ]
